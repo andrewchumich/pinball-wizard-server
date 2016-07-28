@@ -35,12 +35,15 @@ wsServer.on('request', function(request) {
 
     var connection = request.accept();
     console.log((new Date()) + ' Connection accepted.');
+    setTimeout(() => {
+      connection.sendUTF('HELLO, IT\'S ME');
+    }, 5000);
     connection.on('error', function(error) {
       console.log(error);
     });
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
-            const data = message.utf8Data + ' U SUCK';
+            const data = message.utf8Data;
             console.log('Received Message: ' + message.utf8Data);
             connection.sendUTF(data);
         }
