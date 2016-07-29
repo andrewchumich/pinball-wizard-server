@@ -1,12 +1,12 @@
 var WebSocketServer = require('websocket').server;
 var http = require('http');
 
-var server = http.createServer(function(request, response) {
+var server = http.createServer(function (request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
 });
-server.listen(3000, function() {
+server.listen(3000, function () {
     console.log((new Date()) + ' Server is listening on port 3000');
 });
 
@@ -21,27 +21,29 @@ wsServer = new WebSocketServer({
 });
 
 function originIsAllowed(origin) {
-  // put logic here to detect whether the specified origin is allowed.
-  return true;
+    // put logic here to detect whether the specified origin is allowed.
+    return true;
 }
 
-wsServer.on('request', function(request) {
+wsServer.on('request', function (request) {
     if (!originIsAllowed(request.origin)) {
-      // Make sure we only accept requests from an allowed origin
-      request.reject();
-      console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
-      return;
+        // Make sure we only accept requests from an allowed origin
+        request.reject();
+        console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+        return;
     }
 
     var connection = request.accept();
     console.log((new Date()) + ' Connection accepted.');
     setTimeout(() => {
-      connection.sendUTF('HELLO, IT\'S ME');
+        if (connection.connected === true) {
+            connection.sendUTF('HELLO, IT\'S ME');
+        }
     }, 5000);
-    connection.on('error', function(error) {
-      console.log(error);
+    connection.on('error', function (error) {
+        console.log(error);
     });
-    connection.on('message', function(message) {
+    connection.on('message', function (message) {
         if (message.type === 'utf8') {
             const data = message.utf8Data;
             console.log('Received Message: ' + message.utf8Data);
@@ -52,7 +54,7 @@ wsServer.on('request', function(request) {
             connection.sendBytes(message.binaryData);
         }
     });
-    connection.on('close', function(reasonCode, description) {
+    connection.on('close', function (reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
 });
