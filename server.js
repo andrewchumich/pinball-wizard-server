@@ -1,11 +1,14 @@
 var WebSocketServer = require('websocket').server;
 var http = require('http');
 
+// TODO: on startup we should start the 'PinballScore' program
+
 var server = http.createServer(function (request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
 });
+
 server.listen(3000, function () {
     console.log((new Date()) + ' Server is listening on port 3000');
 });
@@ -35,11 +38,16 @@ wsServer.on('request', function (request) {
 
     var connection = request.accept();
     console.log((new Date()) + ' Connection accepted.');
-    setTimeout(() => {
+    // on connection we should start sending score data from PinballScore
+    setInterval(() => {
         if (connection.connected === true) {
-            connection.sendUTF('HELLO, IT\'S ME');
+            connection.sendUTF(JSON.stringify({ 
+                    score: 10,
+                    user: 'ALC'
+                }));
         }
     }, 5000);
+
     connection.on('error', function (error) {
         console.log(error);
     });
