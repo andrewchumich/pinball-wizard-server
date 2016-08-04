@@ -1,5 +1,6 @@
 var WebSocketServer = require('websocket').server;
 var http = require('http');
+var pinball = require('./app/pinball');
 
 // TODO: on startup we should start the 'PinballScore' program
 
@@ -39,15 +40,20 @@ wsServer.on('request', function (request) {
     var connection = request.accept();
     console.log((new Date()) + ' Connection accepted.');
     // on connection we should start sending score data from PinballScore
-    setInterval(() => {
-        if (connection.connected === true) {
-            connection.sendUTF(JSON.stringify({ 
-                    score: 10,
-                    user: 'ALC'
-                }));
-        }
-    }, 5000);
+    const defaultScore = {
+        score: 0,
+        user: ''
+    };
 
+    const config = {
+        onScoreUpdate: (score=defaultScore) => {
+            if (connection.connected === true) {
+                connection.sendUTF(JSON.stringify(score));
+            }
+        }
+    };
+
+    pinball.start(config);
     connection.on('error', function (error) {
         console.log(error);
     });
@@ -55,7 +61,7 @@ wsServer.on('request', function (request) {
         if (message.type === 'utf8') {
             const data = message.utf8Data;
             console.log('Received Message: ' + message.utf8Data);
-            connection.sendUTF(data);
+            pinball.setUser(data);
         }
         else if (message.type === 'binary') {
             console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
