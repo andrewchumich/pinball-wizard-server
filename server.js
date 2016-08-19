@@ -1,11 +1,90 @@
 var WebSocketServer = require('websocket').server;
 var http = require('http');
 var pinball = require('./app/pinball');
+var express = require('express');
+var app = express();
 
+app.get('/', (req, res) => {
+    res.send('hello world');
+});
+
+var expressWs = require('express-ws')(app)
+
+function originIsAllowed(origin) {
+    // put logic here to detect whether the specified origin is allowed.
+    return true;
+}
+
+
+app.ws('/live', (ws, req, next) => {
+    console.log('WEBSOCKET!');
+
+    if (!originIsAllowed(req.hostname)) {
+        // Make sure we only accept reqests from an allowed origin
+        console.log((new Date()) + ' Connection from origin ' + req.origin + ' rejected.');
+        return next();
+    }
+
+    // on connection we should start sending score data from PinballScore
+    const defaultScore = {
+        score: 50,
+        user: ''
+    };
+
+
+    const config = {
+        onScoreUpdate: (score=defaultScore) => {
+            if (ws.readyState === ws.OPEN) {
+                ws.send(JSON.stringify(score));
+            }
+        },
+        onGameStart: () => {
+            // do stuff
+        },
+        onGameEnd: (score=defaultScore) => {
+            // do stuff
+            // instert score into database
+            console.log('GAME END');
+        }
+    };
+
+    // start live updates
+    pinball.start(config);
+
+    ws.on('open', () => {
+        console.log('OPEN');
+    })
+
+    ws.on('close', () => {
+        // end game
+        console.log('close');
+    });
+
+    ws.on('error', (e) => {
+        console.log('error');
+    });
+
+    ws.on('message', (msg) => {
+        console.log('MESSAGE');
+        Object.keys(msg).forEach((key) => {
+            console.log(key);
+        });
+        console.log(typeof msg);
+        console.log(msg);
+/*        const data = msg;
+        console.log('Received Message: ' + msg.utf8Data);
+        pinball.setUser(data);*/
+    });
+
+});
+
+app.listen(3000);
 // TODO: on startup we should start the 'PinballScore' program
 
-var server = http.createServer(function (request, response) {
+/*var server = http.createServer((request, response) => {
     console.log((new Date()) + ' Received request for ' + request.url);
+
+
     response.writeHead(404);
     response.end();
 });
@@ -24,12 +103,9 @@ wsServer = new WebSocketServer({
     autoAcceptConnections: false
 });
 
-function originIsAllowed(origin) {
-    // put logic here to detect whether the specified origin is allowed.
-    return true;
-}
 
 wsServer.on('request', function (request) {
+    console.log('REQUEST');
     if (!originIsAllowed(request.origin)) {
         // Make sure we only accept requests from an allowed origin
         request.reject();
@@ -50,6 +126,14 @@ wsServer.on('request', function (request) {
             if (connection.connected === true) {
                 connection.sendUTF(JSON.stringify(score));
             }
+        },
+        onGameStart: () => {
+            // do stuff
+        },
+        onGameEnd: (score=defaultScore) => {
+            // do stuff
+            // instert score into database
+            console.log('GAME END');
         }
     };
 
@@ -71,4 +155,4 @@ wsServer.on('request', function (request) {
     connection.on('close', function (reasonCode, description) {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
     });
-});
+});*/

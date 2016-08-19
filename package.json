@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
+    "express-ws": "^2.0.0",
+    "sqlite3": "^3.1.4",
     "websocket": "^1.0.23"
   }
 }
