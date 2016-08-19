@@ -4,6 +4,9 @@ var pinball = require('./app/pinball');
 var express = require('express');
 var app = express();
 
+
+// start pinball app
+pinball.start()
 app.get('/', (req, res) => {
     res.send('hello world');
 });
@@ -49,7 +52,7 @@ app.ws('/live', (ws, req, next) => {
     };
 
     // start live updates
-    pinball.start(config);
+    pinball.listen(config);
 
     ws.on('open', () => {
         console.log('OPEN');
@@ -66,9 +69,6 @@ app.ws('/live', (ws, req, next) => {
 
     ws.on('message', (msg) => {
         console.log('MESSAGE');
-        Object.keys(msg).forEach((key) => {
-            console.log(key);
-        });
         console.log(typeof msg);
         console.log(msg);
 /*        const data = msg;
