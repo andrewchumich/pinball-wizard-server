@@ -1,6 +1,5 @@
-var WebSocketServer = require('websocket').server;
 var http = require('http');
-var pinball = require('./app/pinball');
+var pinball = require('./pinball');
 var express = require('express');
 var app = express();
 import { User } from './user';
