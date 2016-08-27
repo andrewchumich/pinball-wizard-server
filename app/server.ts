@@ -3,8 +3,8 @@ var http = require('http');
 var pinball = require('./app/pinball');
 var express = require('express');
 var app = express();
-import { User } from './app/user';
-import { Score } from './app/score';
+import { User } from './user';
+import { Score } from './score';
 
 // start pinball app
 pinball.start()
