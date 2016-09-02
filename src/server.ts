@@ -1,12 +1,11 @@
 var http = require('http');
-var pinball = require('./pinball');
 var express = require('express');
 var app = express();
 import { User } from './user';
 import { Score } from './score';
-
+import * as Pinball from './pinball';
 // start pinball app
-pinball.start()
+Pinball.start()
 app.get('/', (req, res) => {
     res.send('hello world');
 });
@@ -49,7 +48,7 @@ app.ws('/live', (ws, req, next) => {
     };
 
     // start live updates
-    pinball.listen(config);
+    Pinball.listen(config);
 
     ws.on('open', () => {
         console.log('OPEN');
@@ -67,7 +66,7 @@ app.ws('/live', (ws, req, next) => {
     ws.on('message', (msg: string) => {
         const data = msg;
         console.log('Received Message: ' + msg);
-        pinball.setUser(data);
+        Pinball.setUser(data);
     });
 
 });
@@ -131,7 +130,7 @@ wsServer.on('request', function (request) {
         }
     };
 
-    pinball.start(config);
+    Pinball.start(config);
     connection.on('error', function (error) {
         console.log(error);
     });
@@ -139,7 +138,7 @@ wsServer.on('request', function (request) {
         if (message.type === 'utf8') {
             const data = message.utf8Data;
             console.log('Received Message: ' + message.utf8Data);
-            pinball.setUser(data);
+            Pinball.setUser(data);
         }
         else if (message.type === 'binary') {
             console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');

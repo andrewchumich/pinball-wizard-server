@@ -1,6 +1,6 @@
 var sqlite3 = require('sqlite3').verbose();
-import { Score } from './score';
-import { User } from './user';
+import { Score } from '../score';
+import { User } from '../user';
 
 try {
   var db = new sqlite3.Database('database/pinball-wizard.sqlite');
@@ -18,14 +18,14 @@ var score: Score = new Score();
 
 const SCORES = [1, 10, 50, 100];
 
-interface Config {
+export interface PinballConfig {
   onGameStart: (score: Score) => void;
   onGameEnd: (score: Score) => void;
   onScoreUpdate: (score: Score) => void;
 }
 
 // should probably turn these into event listeners
-var masterConfig: Config = {
+var masterConfig: PinballConfig = {
   onGameStart: (score: Score) => console.log('GAME START'),
   onGameEnd: (score: Score) => console.log('GAME END'),
   onScoreUpdate: (score: Score) => console.log('SCORE:', score),
@@ -46,16 +46,16 @@ var timeoutFunction = function() {
 //    onGameEnd: function() ...,
 // }
 
-exports.start = function() {
+export const start = function() {
   // randomly increase score
   timeoutFunction();
 }
 
-exports.listen = function(config: Config) {
+export const listen = function(config: PinballConfig) {
   masterConfig = Object.assign({}, masterConfig, config);
 };
 
-exports.setUser = function(name: string='') {
+export const setUser = function(name: string='') {
   db.serialize(() => {
     db.get('SELECT id, name from users WHERE name = $name', {
       $name: name,
