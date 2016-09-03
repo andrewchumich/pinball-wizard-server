@@ -8,7 +8,7 @@ if (process.platform === 'linux') {
 
 export function start() {
     if (USE_MOCK === true) {
-	console.log(rpio);
+	console.log(gpio);
     } else {
 	console.log('PLATFORM DOES NOT SUPPORT GPIO:');
 	console.log(process.platform);
