@@ -2,6 +2,7 @@
 var sqlite3 = require('sqlite3').verbose();
 const score_1 = require('../score');
 const user_1 = require('../user');
+const Gpio = require('../gpio');
 try {
     var db = new sqlite3.Database('database/pinball-wizard.sqlite');
 }
@@ -28,6 +29,7 @@ var timeoutFunction = function () {
 };
 exports.start = function () {
     timeoutFunction();
+    Gpio.start();
 };
 exports.listen = function (config) {
     masterConfig = Object.assign({}, masterConfig, config);

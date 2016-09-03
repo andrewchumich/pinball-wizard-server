@@ -1,6 +1,8 @@
 var sqlite3 = require('sqlite3').verbose();
 import { Score } from '../score';
 import { User } from '../user';
+import { PinballConfig } from './pinballConfig.interface';
+import * as Gpio from '../gpio';
 
 try {
   var db = new sqlite3.Database('database/pinball-wizard.sqlite');
@@ -18,12 +20,6 @@ var score: Score = new Score();
 
 const SCORES = [1, 10, 50, 100];
 
-export interface PinballConfig {
-  onGameStart: (score: Score) => void;
-  onGameEnd: (score: Score) => void;
-  onScoreUpdate: (score: Score) => void;
-}
-
 // should probably turn these into event listeners
 var masterConfig: PinballConfig = {
   onGameStart: (score: Score) => console.log('GAME START'),
@@ -40,15 +36,12 @@ var timeoutFunction = function() {
     setTimeout(timeoutFunction, randomTimeout);
 };
 
-// config:
-// {
-//    onScoreUpdate: function() ...,
-//    onGameEnd: function() ...,
-// }
-
 export const start = function() {
   // randomly increase score
+  // this should eventually listen to the RaspberryPi inputs
+  // probably form another module
   timeoutFunction();
+  Gpio.start();
 }
 
 export const listen = function(config: PinballConfig) {
