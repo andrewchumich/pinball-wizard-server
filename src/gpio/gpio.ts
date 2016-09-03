@@ -1,6 +1,8 @@
 var USE_MOCK = true;
+var gpio;
 if (process.platform === 'linux') {
     USE_MOCK = false;
+    gpio = require('gpio');
 }    
 
 
