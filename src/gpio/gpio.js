@@ -1,13 +1,17 @@
 "use strict";
 var USE_MOCK = true;
-var gpio;
+var rpio;
 if (process.platform === 'linux') {
     USE_MOCK = false;
-    gpio = require('gpio');
+    rpio = require('rpio');
 }
 function start() {
-    console.log(gpio);
-    console.log('PLATFORM DOES NOT SUPPORT GPIO:');
-    console.log(process.platform);
+    if (USE_MOCK === true) {
+        console.log(rpio);
+    }
+    else {
+        console.log('PLATFORM DOES NOT SUPPORT RPIO:');
+        console.log(process.platform);
+    }
 }
 exports.start = start;
