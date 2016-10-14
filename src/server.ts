@@ -3,21 +3,47 @@
  * and websocket connections and then calling external modules.
  * 
  */
+import { User } from './user'
+import { Score } from './score'
+import * as Pinball from './pinball'
+import { PinballConfig } from './pinball'
 
-var http = require('http');
-var express = require('express');
-var app = express();
-import { User } from './user';
-import { Score } from './score';
-import * as Pinball from './pinball';
-import { PinballConfig } from './pinball';
+
+export const SCORE_EVENT = 'SCORE_EVENT';
 // start pinball app
-Pinball.start()
-app.get('/', (req, res) => {
-    res.send('hello world');
+
+var app = require('express')()
+var server = require('http').createServer(app)
+var io = require('socket.io')(server)
+io.on('connection', (socket) => {
+    console.log('HELLO WORLD')
+    // on connection we should start sending score data from PinballScore
+    const defaultScore: Score = new Score();
+
+    const config: PinballConfig = {
+        onScoreUpdate: (score: Score = defaultScore) => {
+            io.emit(SCORE_EVENT, JSON.stringify(score.toApi()));
+        },
+        onGameStart: (score: Score) => {
+            // do stuff
+        },
+        onGameEnd: (score: Score = defaultScore) => {
+            // do stuff
+            // instert score into database
+            console.log('GAME END');
+        }
+    };
+
+    Pinball.listen(config);
+
 });
 
-var expressWs = require('express-ws')(app)
+Pinball.start()
+
+app.get('/', (req, res) => {
+    res.send('hello world')
+})
+
 
 function originIsAllowed(origin) {
     // put logic here to detect whether the specified origin is allowed.
@@ -27,6 +53,7 @@ function originIsAllowed(origin) {
 /**
  * handle websocket requests on the /live endpoint
  */
+/*
 app.ws('/live', (ws, req, next) => {
     console.log('WEBSOCKET!');
 
@@ -39,9 +66,6 @@ app.ws('/live', (ws, req, next) => {
     // on connection we should start sending score data from PinballScore
     const defaultScore: Score = new Score();
 
-    /**
-     * configure the pinball callbacks
-     */
     const config: PinballConfig = {
         onScoreUpdate: (score: Score=defaultScore) => {
             if (ws.readyState === ws.OPEN) {
@@ -81,5 +105,6 @@ app.ws('/live', (ws, req, next) => {
     });
 
 });
+*/
 
-app.listen(3000);
+server.listen(3000);

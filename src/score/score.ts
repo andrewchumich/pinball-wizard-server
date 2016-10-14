@@ -12,7 +12,7 @@ export class Score {
   toApi(): any {
     return {
       score: this.score,
-      user: this.user.name,
+      user: this.user,
     };
   }
 }

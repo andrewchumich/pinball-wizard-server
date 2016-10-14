@@ -32,7 +32,7 @@ var timeoutFunction = function() {
 
     masterConfig.onScoreUpdate(score);
 
-    const randomTimeout = Math.random() * 3000;
+    const randomTimeout = Math.random() * 5000;
     setTimeout(timeoutFunction, randomTimeout);
 };
 

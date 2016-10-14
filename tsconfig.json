@@ -5,6 +5,14 @@
         "declaration": false,
         "noImplicitAny": false,
         "removeComments": true,
-        "noLib": false
-    }
+        "noLib": false,
+        "sourceMap": true,
+        "outDir": "build/"
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "src/server.ts"
+    ]
 }
