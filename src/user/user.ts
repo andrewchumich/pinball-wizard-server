@@ -11,7 +11,6 @@ export class User {
   constructor(user: { name: string, id: number } = { name: '', id: -1 }) {
       this.id = user.id;
       this.name = user.name;
-      console.log('SOMETHING');
   }
     
 };

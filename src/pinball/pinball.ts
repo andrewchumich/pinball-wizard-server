@@ -1,9 +1,9 @@
 var sqlite3 = require('sqlite3').verbose()
-import { Score } from '../score'
 import { User } from '../user'
 import { PinballConfig } from './pinballConfig.interface'
 import * as Gpio from '../gpio'
-
+import { pinballState } from './pinballState.interface'
+import { dispatch, SET_SCORE, SET_USER, END_GAME, START_GAME } from './pinball.reducer'
 try {
   var db = new sqlite3.Database('database/pinball-wizard.sqlite')
 } catch (e) {
@@ -16,60 +16,51 @@ db.serialize(() => {
   })
 })
 
-var score: Score = new Score()
+// initialize state
+var state = dispatch()
 
-const SCORES = [1, 10, 50, 100]
-
-// the master config that will be used when creating new configs
-// These functions are what should happen no matter what
-var masterConfig: PinballConfig = {
-  onGameStart: (score: Score) => console.log('GAME START'),
-  onGameEnd: (score: Score) => console.log('GAME END'),
-  onScoreUpdate: (s: Score) => {
-    console.log('SCORE:', score)
-    score = s
-  },
+// dummy config
+var initialConfig: PinballConfig = {
+  onStateChange: (state: pinballState) {
+    console.log('STATE CHANGED', state)
+  }
 }
 
 
 // the config that will actuall be used
-var currentConfig: PinballConfig = Object.assign({}, masterConfig)
+var currentConfig: PinballConfig = Object.assign({}, initialConfig)
 
+// on game start, listen to GPIO outputs
 export const start = function start() {
-  // randomly increase score
-  // this should eventually listen to the RaspberryPi inputs
-  // probably form another module
   var gpioConfig: Gpio.GpioInterface = {
-    onScoreUpdate: (num: number) => {
-      score.score += num
-      currentConfig.onScoreUpdate(score)
-    },
     onGameStart: () => {
-      console.log('GPIO START')
+      console.log('GAME START')
+      state = dispatch({
+        type: START_GAME
+      })
+      currentConfig.onStateChange(state)
     },
     onGameEnd: () => {
-      console.log('GPIO END')
-    }
+      console.log('GAME END')
+      state = dispatch({
+        type: END_GAME
+      })
+      currentConfig.onStateChange(state)
+    },
+    onScoreUpdate: (score: number) => {
+      state = dispatch({
+        type: SET_SCORE,
+        payload: state.score + score
+      })
+      currentConfig.onStateChange(state)
+    },
   }
 
   Gpio.start(gpioConfig)
 }
 
 export const setConfig = function listen(config: PinballConfig) {
-  currentConfig = {
-    onGameStart: (score: Score) => {
-      config.onGameStart(score)
-      masterConfig.onGameStart(score)
-    },
-    onGameEnd: (score) => {
-      config.onGameEnd(score)
-      masterConfig.onGameStart(score)
-    },
-    onScoreUpdate: (score) => {
-      config.onScoreUpdate(score)
-      masterConfig.onScoreUpdate(score)
-    }
-  }
+  currentConfig = config;
 }
 
 export const setUser = function setUser(name: string='') {
@@ -82,7 +73,7 @@ export const setUser = function setUser(name: string='') {
       } else if (user === undefined) {
         console.log('No user:', name, 'need to create user')
       } else {
-        score.user = new User(user)
+        state.user = new User(user)
       }
     })
   })
