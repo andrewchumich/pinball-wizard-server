@@ -34,7 +34,9 @@ io.on('connection', (socket) => {
         }
     };
 
-    Pinball.listen(config);
+    Pinball.setConfig(config);
+
+    Pinball.setUser('ALC');
 
 });
 
