@@ -6,14 +6,31 @@
 import { User } from './user'
 import * as Pinball from './pinball'
 import { PinballConfig, pinballState } from './pinball'
-
+var Primus = require('primus')
 
 export const STATE_CHANGE = 'STATE_CHANGE';
 // start pinball app
 
 var app = require('express')()
 var server = require('http').createServer(app)
-var io = require('socket.io')(server)
+
+console.log('HELLO')
+var p = Primus.createServer({
+    port: 3000,
+    transformer: 'websockets'
+}, (res) => {
+    console.log(res)
+})
+p.on('connection', (res) => {
+    console.log(res)
+    console.log('hello')
+})
+
+/*app.get('/', (req, res) => {
+    res.send('hello world')
+})*/
+
+/*var io = require('socket.io')(server)
 io.on('connection', (socket) => {
     console.log('HELLO WORLD')
     // on connection we should start sending score data from PinballScore
@@ -33,14 +50,11 @@ io.on('connection', (socket) => {
 
 Pinball.start()
 
-app.get('/', (req, res) => {
-    res.send('hello world')
-})
 
 
 function originIsAllowed(origin) {
     // put logic here to detect whether the specified origin is allowed.
     return true;
 }
-
-server.listen(3000);
+*/
+//server.listen(3000);

@@ -21,7 +21,7 @@ var state = dispatch()
 
 // dummy config
 var initialConfig: PinballConfig = {
-  onStateChange: (state: pinballState) {
+  onStateChange: (state: pinballState) => {
     console.log('STATE CHANGED', state)
   }
 }
