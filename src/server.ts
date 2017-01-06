@@ -6,25 +6,44 @@
 import { User } from './user'
 import * as Pinball from './pinball'
 import { PinballConfig, pinballState } from './pinball'
-var Primus = require('primus')
-
+import { initializeSSE } from './sse'
+var express = require('express')
+var EventEmitter = require('events')
+var app = express()
 export const STATE_CHANGE = 'STATE_CHANGE';
 // start pinball app
+var sse = initializeSSE()
+const ScoreEmitter = new EventEmitter() 
 
-var app = require('express')()
-var server = require('http').createServer(app)
+// this is a Server-Side Events endpoint
+app.get('/scores', (req, res) => {
+    console.log('OPEN CONNECTION')
+    res = sse(res)
+    let event_callback = (score: pinballState) => {
+        res.push(score)
+    }
+    ScoreEmitter.on('score', event_callback)
+    // set event listener for res
 
-console.log('HELLO')
-var p = Primus.createServer({
-    port: 3000,
-    transformer: 'websockets'
-}, (res) => {
-    console.log(res)
+    req.on('close', () => {
+        ScoreEmitter.removeListener('score', event_callback)
+        console.log(ScoreEmitter.listeners('score'))
+    })
 })
-p.on('connection', (res) => {
-    console.log(res)
-    console.log('hello')
-})
+
+const config: PinballConfig = {
+    onStateChange: (state: pinballState) => {
+        ScoreEmitter.emit('score', state)
+    }
+};
+
+Pinball.setConfig(config);
+
+Pinball.setUser('ALC');
+
+Pinball.start()
+
+app.listen(3000)
 
 /*app.get('/', (req, res) => {
     res.send('hello world')
