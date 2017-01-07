@@ -26,6 +26,7 @@ app.get('/scores', (req, res) => {
     // set event listener for res
 
     req.on('close', () => {
+        console.log('CLOSE CONNECTION')
         ScoreEmitter.removeListener('score', event_callback)
     })
 })

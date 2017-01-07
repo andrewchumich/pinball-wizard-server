@@ -11,7 +11,7 @@ try {
 }
 
 db.serialize(() => {
-  db.all("SELECT * from users", (err, rows) => {
+  db.all("SELECT id, name from users", (err, rows) => {
     console.log(rows)
   })
 })
@@ -73,7 +73,10 @@ export const setUser = function setUser(name: string='') {
       } else if (user === undefined) {
         console.log('No user:', name, 'need to create user')
       } else {
-        state.user = new User(user)
+        state = dispatch({
+          type: SET_USER,
+          payload: new User(user)
+        })
       }
     })
   })

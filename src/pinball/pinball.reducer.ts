@@ -10,7 +10,7 @@ export const SET_USER = 'SET_USER'
 export const START_GAME = 'START_GAME'
 export const END_GAME = 'END_GAME'
 
-const defaultState: pinballState = {
+export const defaultState: pinballState = {
   score: 0,
   user: new User(),
   status: status.STOPPED
@@ -44,5 +44,6 @@ export function pinballReducer(state: pinballState = defaultState, action: actio
 
 var state: pinballState = defaultState
 export function dispatch(action?: action): pinballState {
-  return pinballReducer(state, action)
+  state = pinballReducer(state, action)
+  return state
 }
