@@ -4,6 +4,8 @@ import { PinballConfig } from './pinballConfig.interface'
 import * as Gpio from '../gpio'
 import { pinballState } from './pinballState.interface'
 import { dispatch, SET_SCORE, SET_USER, END_GAME, START_GAME } from './pinball.reducer'
+import { getUser } from './pinball.storage'
+
 try {
   var db = new sqlite3.Database('database/pinball-wizard.sqlite')
 } catch (e) {
@@ -65,9 +67,7 @@ export const setConfig = function listen(config: PinballConfig) {
 
 export const setUser = function setUser(name: string='') {
   db.serialize(() => {
-    db.get('SELECT id, name from users WHERE name = $name', {
-      $name: name || 'ALC',
-    }, (err, user) => {
+    getUser(name, (err, user) => {
       if (err !== null) {
         console.error('pinball::setUser error:', err)
       } else if (user === undefined) {
@@ -77,6 +77,7 @@ export const setUser = function setUser(name: string='') {
           type: SET_USER,
           payload: new User(user)
         })
+        console.log(state)
       }
     })
   })
