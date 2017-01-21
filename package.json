@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --watch src --recursive --compilers spec.ts:ts-node/register",
+    "test": "mocha src --recursive --compilers spec.ts:ts-node/register",
+    "test:dev": "mocha --watch src --recursive --compilers spec.ts:ts-node/register",
     "start": "tsc && node ./build/server.js",
     "compile": "tsc"
   },

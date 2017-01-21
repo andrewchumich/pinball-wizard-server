@@ -1,5 +1,5 @@
-import { pinballState } from './pinballState.interface'
+import { PinballState } from './pinballState.interface'
 
 export interface PinballConfig {
-  onStateChange: (pinballState) => any
+  onStateChange: (pinballState: PinballState) => any
 }

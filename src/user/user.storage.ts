@@ -1,90 +1,56 @@
 var sqlite3 = require('sqlite3').verbose()
 import { DATABASE_PATH } from '../storage'
 import { User } from './user'
-let db;
+import { Storage } from '../storage'
 
+let storage_obj: UserStorage
 
-export const createUsersTable = function createUsersTable(): Promise<any> {
-  const CREATE_USERS_TABLE_STATEMENT = `
-    CREATE TABLE users 
+export class UserStorage extends Storage {
+  public TABLE_NAME = 'users'
+  public CREATE_TABLE_STATEMENT =  `
+    CREATE TABLE ${this.TABLE_NAME} 
     (
       id INTEGER PRIMARY KEY,
       name TEXT UNIQUE NOT NULL
     )
   `
-  return new Promise((resolve, reject) => {
-    getDatabase().then((db) => {
-      db.run(CREATE_USERS_TABLE_STATEMENT, (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(db)
-        }
-      })
-    })
-  })
-}
+  public ADD_STATEMENT = `INSERT INTO ${this.TABLE_NAME} VALUES (?, ?)`
 
-// not sure if these should be split up into different modules,
-// but this will be good enough for now
+  public GET_STATEMENT = `SELECT * FROM ${this.TABLE_NAME} WHERE name = ?`
 
-export const destroyDatabase = function destroyDatabase(): boolean {
-  if (!db) {
-    return false
-  } else {
-    db = undefined
-    return true
-  }
-}
-
-export const getDatabase = function getDatabase(dbPath?: string): Promise<any> {
-  if (!dbPath) {
-    dbPath = DATABASE_PATH
-  }
-  if (db !== undefined) {
-    return new Promise((resolve) => {
-      resolve(db)
-    })
-  }
-  return new Promise((resolve, reject) => {
-    try {
-      db = new sqlite3.Database(dbPath)
-      resolve(db)
-    } catch (e) {
-      console.error('Error getting database')
-      console.error(e)
-      reject(e)
-    }
-  })
-}
-
-export const addUser = function addUser(name: string): Promise<User> {
-  const ADD_USER_STATEMENT = 'INSERT INTO users VALUES (?, ?)'
-  return new Promise((resolve, reject) => {
-    getDatabase().then((db) => {
-      db.run(ADD_USER_STATEMENT, [null, name], (err) => {
-        if (err) {
-          return reject(err)
-        }
-        return resolve(getUser(name))
-      })
-    })
-  })
-}
-
-export const getUser = function getUser(name: string): Promise<User> {
-  
-  return getDatabase().then((db) => {
+  public add = (user: User): Promise<User> => {
     return new Promise((resolve, reject) => {
-      db.serialize(() => {
-        const GET_USER_STATEMENT = 'SELECT * FROM users WHERE name = ?'
-        let row = db.get(GET_USER_STATEMENT, [name], (error, row) => {
-          if (error) {
-            reject(error)
+      this.getDatabase().then((db) => {
+        db.run(this.ADD_STATEMENT, [null, user.name], (err) => {
+          if (err) {
+            return reject(err)
           }
-          resolve(new User(row))
+          return resolve(this.get(user.name))
         })
       })
     })
-  })
+  }
+
+  public get = (name: string): Promise<User> => {
+    return this.getDatabase().then((db) => {
+      return new Promise((resolve, reject) => {
+        db.serialize(() => {
+          let row = db.get(this.GET_STATEMENT, [name], (error, row) => {
+            if (error) {
+              reject(error)
+            }
+            resolve(new User(row))
+          })
+        })
+      })
+    }) 
+  }
+}
+
+export const getUserStorage = function getUserStorage(): UserStorage {
+  if (!storage_obj) {
+    storage_obj = new UserStorage()
+  }
+
+  return storage_obj
 }

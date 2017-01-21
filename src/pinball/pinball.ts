@@ -2,28 +2,18 @@ var sqlite3 = require('sqlite3').verbose()
 import { User } from '../user'
 import { PinballConfig } from './pinballConfig.interface'
 import * as Gpio from '../gpio'
-import { pinballState } from './pinballState.interface'
+import { PinballState } from './PinballState.interface'
 import { dispatch, SET_SCORE, SET_USER, END_GAME, START_GAME } from './pinball.reducer'
-import { getUser } from '../user'
+import { UserStorage, getUserStorage } from '../user'
 
-try {
-  var db = new sqlite3.Database('database/pinball-wizard.sqlite')
-} catch (e) {
-  console.log(e)
-}
-
-db.serialize(() => {
-  db.all("SELECT id, name from users", (err, rows) => {
-    console.log(rows)
-  })
-})
+let user_storage_obj: UserStorage = getUserStorage() 
 
 // initialize state
 var state = dispatch()
 
 // dummy config
 var initialConfig: PinballConfig = {
-  onStateChange: (state: pinballState) => {
+  onStateChange: (state: PinballState) => {
     console.log('STATE CHANGED', state)
   }
 }
@@ -52,7 +42,7 @@ export const start = function start() {
     onScoreUpdate: (score: number) => {
       state = dispatch({
         type: SET_SCORE,
-        payload: state.score + score
+        payload: state.score.score + score
       })
       currentConfig.onStateChange(state)
     },
@@ -66,14 +56,12 @@ export const setConfig = function listen(config: PinballConfig) {
 }
 
 export const setUser = function setUser(name: string='') {
-  db.serialize(() => {
-    getUser(name).then((user: User) => {
+    user_storage_obj.get(name).then((user: User) => {
       state = dispatch({
         type: SET_USER,
-        payload: new User(user)
+        payload: user
       })
     }, (err) => {
       console.log('ERROR ADDING USER:', err)
     })
-  })
 }

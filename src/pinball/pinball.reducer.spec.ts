@@ -8,8 +8,9 @@ import { action } from '../reducers'
 
 describe('pinball reducer', () => {
   it('should set user', () => {
+    console.log(defaultState)
     const state = Object.assign({}, defaultState)
-    expect(state.user).to.be.eql(new User())
+    expect(state.score.user).to.be.eql(new User())
 
     const name = 'ALC'
     const id = 1
@@ -18,12 +19,12 @@ describe('pinball reducer', () => {
       type: SET_USER,
       payload: user
     }
-    expect(pinballReducer(state, test_action).user).to.be.eql(user)
+    expect(pinballReducer(state, test_action).score.user).to.be.eql(user)
   })
 
   it('should set score', () => {
     const state = Object.assign({}, defaultState)
-    expect(state.score).to.be.equal(0)
+    expect(state.score.score).to.be.equal(0)
 
     const score = 10
     const test_action = {

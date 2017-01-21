@@ -6,19 +6,26 @@ chai.use(chaiAsPromised);
 var expect = chai.expect
 chai.should()
 
-import { User } from './user'
-import { getUserStorage, UserStorage } from './user.storage'
+import { User, UserStorage, getUserStorage } from '../user'
+import { Score } from './score'
+import { getScoreStorage, ScoreStorage } from './score.storage'
 import { ConnectionManager } from '../storage'
 
 describe('pinball storage', () => {
+    let testUser = new User({ name: 'ALC' })
     const STORAGE_LOCATION = ':memory:'
-
+    let scoreStorage = getScoreStorage()
     let userStorage = getUserStorage()
     beforeEach((done) => {
       // create database
       ConnectionManager.getConnection(STORAGE_LOCATION).then((db) => {
         return userStorage.createTable()
       }).then(() => {
+        return scoreStorage.createTable()
+      }).then(() => {
+        return userStorage.add(testUser)
+      }).then((user) => {
+        testUser = user
         done()
       })
     })
@@ -30,19 +37,10 @@ describe('pinball storage', () => {
       })
     })
 
-    it('should add user', () => {
-      const USER_NAME = 'ALC'
-      let user = new User({ name: USER_NAME })
-      let addUserPromise = userStorage.add(user)
-      return addUserPromise.should.eventually.have.property('name', USER_NAME)
+
+    it('should add score', () => {
+      const my_score: Score = new Score({ score: 10, user: testUser })
+      return scoreStorage.add(my_score).should.eventually.eql(my_score)
     })
 
-    it('should not be able to add user twice', () => {
-      const USER_NAME = 'ALC'
-      let user = new User({ name: USER_NAME })
-      let addUserPromise = userStorage.add(user).then((u) => {
-        return userStorage.add(user)
-      })
-      return addUserPromise.should.eventually.be.rejected
-    })
 })
