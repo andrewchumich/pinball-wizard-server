@@ -1,7 +1,7 @@
 import { PinballState } from './PinballState.interface'
 import { status } from './status.enum'
 
-
+import { cloneDeep } from 'lodash'
 import { User } from '../user'
 import { action } from '../reducers'
 import { Score } from '../score'
@@ -20,20 +20,20 @@ export function pinballReducer(state: PinballState = defaultState, action: actio
   var newState: PinballState
   switch (action.type) {
     case SET_SCORE:
-      newState = Object.assign({}, state)
+      newState = cloneDeep(state)
       newState.score = action.payload 
       return newState
     case SET_USER:
-      newState = Object.assign({}, state)
+      newState = cloneDeep(state)
       newState.score.user = action.payload
       return newState
     case START_GAME:
-      newState = Object.assign({}, state)
+      newState = cloneDeep(state)
       newState.status = status.RUNNING
       newState.score.score = 0
       return newState
     case END_GAME:
-      newState = Object.assign({}, state)
+      newState = cloneDeep(state)
       newState.status = status.STOPPED
       return newState
     default:
