@@ -45,4 +45,11 @@ describe('pinball storage', () => {
       })
       return addUserPromise.should.eventually.be.rejected
     })
+    
+    it('should reject when getting user which doesn\'t exist', () => {
+      const NEW_USER_NAME = 'NEW_USER'
+      let getUserPromise = userStorage.get(NEW_USER_NAME)
+
+      return getUserPromise.should.eventually.be.rejectedWith(undefined)
+    })
 })

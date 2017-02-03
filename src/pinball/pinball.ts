@@ -6,8 +6,6 @@ import { PinballState } from './PinballState.interface'
 import { dispatch, SET_SCORE, SET_USER, END_GAME, START_GAME } from './pinball.reducer'
 import { UserStorage, getUserStorage } from '../user'
 
-let user_storage_obj: UserStorage = getUserStorage() 
-
 // initialize state
 var state = dispatch()
 
@@ -55,13 +53,13 @@ export const setConfig = function listen(config: PinballConfig) {
   currentConfig = config;
 }
 
-export const setUser = function setUser(name: string='') {
-    user_storage_obj.get(name).then((user: User) => {
+export const setUser = function setUser(name: string=''): Promise<User> {
+    return getUserStorage().get(name).then((user: User) => {
       state = dispatch({
         type: SET_USER,
         payload: user
       })
     }, (err) => {
-      console.log('ERROR ADDING USER:', err)
+      return getUserStorage().add(new User({ name }))
     })
 }

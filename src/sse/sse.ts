@@ -47,7 +47,6 @@ export const initializeSSE = function initializeSSE(retry=15000) {
             }
             res.write(':keep-alive\n');
         }, 20000);
-
         // cleanup on close
         res.on('close', function close() {
             clearInterval(keepAlive);

@@ -7,6 +7,7 @@
     "test": "mocha src --recursive --compilers spec.ts:ts-node/register",
     "test:dev": "mocha --watch src --recursive --compilers spec.ts:ts-node/register",
     "start": "tsc && node ./build/server.js",
+    "create:database": "tsc && node ./build/database.initialize.js",
     "compile": "tsc"
   },
   "author": "",
@@ -16,6 +17,7 @@
     "@types/lodash": "^4.14.50",
     "@types/mocha": "^2.2.36",
     "@types/object-assign": "^4.0.29",
+    "@types/yargs": "^6.5.0",
     "express": "^4.14.0",
     "lodash": "^4.17.4",
     "rpio": "^0.9.12",
@@ -28,6 +30,7 @@
     "chai-as-promised": "^6.0.0",
     "mocha": "^3.2.0",
     "ts-node": "^2.0.0",
-    "typescript": "^2.0.3"
+    "typescript": "^2.0.3",
+    "yargs": "^6.6.0"
   }
 }

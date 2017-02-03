@@ -21,7 +21,7 @@ export function pinballReducer(state: PinballState = defaultState, action: actio
   switch (action.type) {
     case SET_SCORE:
       newState = cloneDeep(state)
-      newState.score = action.payload 
+      newState.score.score = action.payload 
       return newState
     case SET_USER:
       newState = cloneDeep(state)

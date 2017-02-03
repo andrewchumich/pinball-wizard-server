@@ -34,13 +34,15 @@ export class UserStorage extends Storage {
   public get = (name: string): Promise<User> => {
     return this.getDatabase().then((db) => {
       return new Promise((resolve, reject) => {
-        db.serialize(() => {
-          let row = db.get(this.GET_STATEMENT, [name], (error, row) => {
-            if (error) {
-              reject(error)
-            }
+        db.get(this.GET_STATEMENT, [name], (error, row) => {
+          if (error) {
+            reject(error)
+          }
+          if (row === undefined) {
+            reject(undefined)
+          } else {
             resolve(new User(row))
-          })
+          }
         })
       })
     }) 

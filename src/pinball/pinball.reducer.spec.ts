@@ -32,7 +32,7 @@ describe('pinball reducer', () => {
       type: SET_SCORE,
       payload: score
     }
-    expect(pinballReducer(state, test_action).score).to.be.equal(score)
+    expect(pinballReducer(state, test_action).score.score).to.be.equal(score)
 
   })
 
